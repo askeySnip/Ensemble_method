@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.cross_validation import train_test_split
 import matplotlib.pyplot as plt
+import pickle
 
 
 '''caculate the error rate.'''
@@ -29,7 +30,7 @@ def adaboost_clf(x_train, y_train, x_test, y_test, iteration, clf):
         alpha_m = 0.5 * np.log( (1 - e_m) / float(e_m) )
         # Dm'
         dm_help = [x if x==1 else -1 for x in miss]
-        dm_ = np.dot(w, np.exp([float(x) * alpha_m for x in dm_help]))
+        dm_ = np.multiply(w, np.exp([float(x) * alpha_m for x in dm_help]))
         # Zm
         zm = sum(dm_)
         # weight(Dm)
@@ -48,14 +49,14 @@ class Adaboost_classifier:
     iteration = 50
     base_clf = DecisionTreeClassifier(max_depth = 1, random_state = 1)
     alpha = []
-    clf = []
+    models = []
 
-    '''recive iteration & base classifier as parameter'''
+    '''Init'''
     def __init__(self, iteration, base_clf):
         self.iteration = iteration
         self.base_clf = base_clf
 
-    '''caculate the error rate.'''
+    '''Get the error rate of predicition'''
     def get_error_rate(self, prediction, target):
         return sum(prediction != target) / float(len(prediction))
 
@@ -77,20 +78,20 @@ class Adaboost_classifier:
             alpha_m = 0.5 * np.log( (1 - e_m) / float(e_m) )
             # Dm'
             dm_help = [x if x == 1 else -1 for x in miss]
-            dm_ = np.dot(w, np.exp([float(x) * alpha_m for x in dm_help]))
+            dm_ = np.multiply(w, np.exp([float(x) * alpha_m for x in dm_help]))
             # Zm
             zm = sum(dm_)
             # append to clf
-            self.clf.append(base_clf)
+            self.models.append(pickle.dumps(self.base_clf))
             self.alpha.append(alpha_m)
             # weight update
             w = dm_ / zm
 
-    '''Predicition'''
+    '''Prediciton'''
     def predict(self, x):
         pred = np.zeros(len(x))
         for i in range(self.iteration):
-            pred_i = self.clf[i].predict(x)
+            pred_i = pickle.loads(self.models[i]).predict(x)
             pred = [sum(x) for x in zip(pred, [x * self.alpha[i] for x in pred_i])]
         pred = np.sign(pred)
         return pred
@@ -115,7 +116,7 @@ class Adaboost_classifier:
             alpha_m = 0.5 * np.log( (1 - e_m) / float(e_m) )
             # Dm'
             dm_help = [x if x==1 else -1 for x in miss]
-            dm_ = np.dot(w, np.exp([float(x) * alpha_m for x in dm_help]))
+            dm_ = np.multiply(w, np.exp([float(x) * alpha_m for x in dm_help]))
             # Zm
             zm = sum(dm_)
             # weight(Dm)
