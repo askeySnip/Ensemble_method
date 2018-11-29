@@ -213,7 +213,7 @@ class Adaboost(object):
             for r in res:
                 dic[r[0]] = r[1] if not dic.has_key(r[0]) else dic.get(r[0]) + r[1]
             final_result.append(sorted(dic, key=lambda x:dic[x])[-1])
-        print float(np.sum(final_result == self.y_test)) / len(self.y_test)
+        print(float(np.sum(final_result == self.y_test)) / len(self.y_test))
 
         return final_result
 
