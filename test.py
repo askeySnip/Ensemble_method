@@ -18,3 +18,7 @@ if __name__ == '__main__':
     adaboost.fit(x_train, y_train);
     pred = adaboost.predict(x_train)
     print(adaboost.get_error_rate(pred, y_train))
+
+
+    adaboost_estimator = Adaboost(base_clf=DecisionTreeClassifier, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+    adaboost_estimator.train()
